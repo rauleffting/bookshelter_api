@@ -36,12 +36,9 @@ class UserLogoutView(APIView):
     def post(self, request):
         logout(request)
         return Response({'message': 'Logout successful.'})
-    
+
 class BookListView(APIView):
     def get(self, request):
-        if not request.user.is_authenticated:
-            return Response({'message': 'Unauthorized'}, status=401)
-
         books = Book.objects.all()
         serializer = BookSerializer(books, many=True)
         return Response(serializer.data)
@@ -49,9 +46,35 @@ class BookListView(APIView):
     def post(self, request):
         if not request.user.is_authenticated:
             return Response({'message': 'Unauthorized'}, status=401)
-
+        
         serializer = BookSerializer(data=request.data)
         if serializer.is_valid():
             book = serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+
+class BookDetailView(APIView):
+    def get(self, request, pk):
+        book = Book.objects.get(pk=pk)
+        serializer = BookSerializer(book)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        if not request.user.is_authenticated:
+            return Response({'message': 'Unauthorized'}, status=401)
+        
+        book = Book.objects.get(pk=pk)
+        serializer = BookSerializer(book, data=request.data)
+        if serializer.is_valid():
+            book = serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        if not request.user.is_authenticated:
+            return Response({'message': 'Unauthorized'}, status=401)
+        
+        book = Book.objects.get(pk=pk)
+        book.delete()
+        return Response(status=204)
