@@ -33,6 +33,7 @@ urlpatterns = [
     path('books/<int:pk>/edit/', login_required(BookDetailView.as_view()), name='edit_book'),
     path('books/<int:pk>/delete/', login_required(BookDetailView.as_view()), name='delete_book'),
     path('profile/', login_required(UserProfileView.as_view()), name='profile'),
+    path('profile/edit/', login_required(UserProfileView.as_view()), name='edit_profile'),
     # path('favorites/', FavoritesView.as_view(), name='favorites'),
     # path('cart/', CartView.as_view(), name='cart')
 ]
