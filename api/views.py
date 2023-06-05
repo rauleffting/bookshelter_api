@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from api.serializers import UserSerializer, BookSerializer
-from api.models import User, Book
+from api.models import Book
 from django.contrib.auth import authenticate, login, logout
 
 from django.middleware.csrf import get_token
@@ -11,7 +12,6 @@ from django.http import JsonResponse
 def csrf_token_view(request):
     csrf_token = get_token(request)
     return JsonResponse({'csrf_token': csrf_token})
-
 
 class UserRegistrationView(APIView):
     def post(self, request):
@@ -36,6 +36,12 @@ class UserLogoutView(APIView):
     def post(self, request):
         logout(request)
         return Response({'message': 'Logout successful.'})
+    
+class UserProfileView(APIView):    
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 
 class BookListView(APIView):
     def get(self, request):
@@ -44,8 +50,8 @@ class BookListView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        if not request.user.is_authenticated:
-            return Response({'message': 'Unauthorized'}, status=401)
+        if not request.user.is_superuser:
+            return Response({'message': 'Forbidden'}, status=status.HTTP_403_FORBIDDEN)
         
         serializer = BookSerializer(data=request.data)
         if serializer.is_valid():
@@ -61,8 +67,8 @@ class BookDetailView(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk):
-        if not request.user.is_authenticated:
-            return Response({'message': 'Unauthorized'}, status=401)
+        if not request.user.is_superuser:
+            return Response({'message': 'Forbidden'}, status=status.HTTP_403_FORBIDDEN)
         
         book = Book.objects.get(pk=pk)
         serializer = BookSerializer(book, data=request.data)
@@ -72,9 +78,9 @@ class BookDetailView(APIView):
         return Response(serializer.errors, status=400)
 
     def delete(self, request, pk):
-        if not request.user.is_authenticated:
-            return Response({'message': 'Unauthorized'}, status=401)
+        if not request.user.is_superuser:
+            return Response({'message': 'Forbidden'}, status=status.HTTP_403_FORBIDDEN)
         
         book = Book.objects.get(pk=pk)
         book.delete()
-        return Response(status=204)
+        return Response({'message': 'Book deleted successfully!'}, status=204)

@@ -1,0 +1,24 @@
+# Arquivos e diretórios específicos do Django
+*.pyc
+*.pyo
+__pycache__/
+staticfiles/
+media/
+
+# Arquivos gerados pelo ambiente virtual
+venv/
+myenv/
+
+# Arquivos de configuração local
+settings_local.py
+
+# Arquivos de banco de dados PostgreSQL
+*.conf
+*.cfg
+
+# Logs
+logs/
+
+# Outros arquivos e diretórios
+*.swp
+.DS_Store

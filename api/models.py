@@ -6,6 +6,10 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     groups = models.ManyToManyField('auth.Group', related_name='custom_user_set', blank=True)
     user_permissions = models.ManyToManyField('auth.Permission', related_name='custom_user_set', blank=True)
+    account_type = models.CharField(max_length=10, choices=(('admin', 'Admin'), ('user', 'User')), default='user')
+
+    def is_admin(self):
+        return self.account_type == 'admin'
 
 class Book(models.Model):
     title = models.CharField(max_length=100)
