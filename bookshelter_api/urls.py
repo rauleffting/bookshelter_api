@@ -17,7 +17,7 @@ Including another URLconf
 
 from django.contrib.auth.decorators import login_required
 from django.urls import path
-from api.views import UserRegistrationView, UserLoginView, UserLogoutView, UserProfileView, BookListView, BookDetailView, csrf_token_view
+from api.views import UserRegistrationView, UserLoginView, UserLogoutView, UserProfileView, BookListView, BookDetailView, FavoriteListView, csrf_token_view
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -34,8 +34,11 @@ urlpatterns = [
     path('books/<int:pk>/delete/', login_required(BookDetailView.as_view()), name='delete_book'),
     path('profile/', login_required(UserProfileView.as_view()), name='profile'),
     path('profile/edit/', login_required(UserProfileView.as_view()), name='edit_profile'),
-    # path('favorites/', FavoritesView.as_view(), name='favorites'),
-    # path('cart/', CartView.as_view(), name='cart')
+    # path('profile/adress'),
+    # path('profile/purchases'),
+    path('favorites/', login_required(FavoriteListView.as_view()), name='favorite-list'),
+    # path('cart/', login_required(CartView.as_view()), name='cart'),
+    # path('reviews/),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

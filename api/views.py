@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from api.serializers import UserSerializer, BookSerializer
-from api.models import Book
+from api.serializers import UserSerializer, BookSerializer, FavoriteSerializer
+from api.models import Book, Favorite
 from django.contrib.auth import authenticate, login, logout
 
 from django.middleware.csrf import get_token
@@ -92,3 +92,25 @@ class BookDetailView(APIView):
         book = Book.objects.get(pk=pk)
         book.delete()
         return Response({'message': 'Book deleted successfully!'}, status=204)
+    
+class FavoriteListView(APIView):
+    def get(self, request):
+        user = request.user
+        favorites = Favorite.objects.filter(user=user)
+        serializer = FavoriteSerializer(favorites, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        user = request.user
+        book_id = request.data.get('book_id')
+        book = Book.objects.get(pk=book_id)
+
+        favorite = Favorite(user=user, book=book)
+        favorite.save()
+        serializer = FavoriteSerializer(favorite)
+        return Response(serializer.data, status=201)
+    
+    def delete(self, request, pk):
+        favorite = Favorite.objects.get(pk=pk)
+        favorite.delete()
+        return Response({'message': 'Favorite removed successfully!'}, status=204)
